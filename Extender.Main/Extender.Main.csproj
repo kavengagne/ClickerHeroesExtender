@@ -88,11 +88,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DesignMocks\MainWindowViewModelMock.cs" />
+    <Compile Include="Models\DispatcherItem.cs" />
+    <Compile Include="Enums\DispatcherItemId.cs" />
+    <Compile Include="Services\RunnerDispatcher.cs" />
     <Compile Include="Models\BonusItem.cs" />
-    <Compile Include="Classes\BonusKeeper.cs" />
+    <Compile Include="Models\BonusItemsObservableCollection.cs" />
     <Compile Include="Helpers\ExceptionWrapper.cs" />
-    <Compile Include="Classes\ExtenderRunner.cs" />
-    <Compile Include="ViewModels\ExtenderSettings.cs" />
+    <Compile Include="Services\ExtenderRunner.cs" />
+    <Compile Include="Models\ExtenderSettings.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -127,7 +131,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Classes\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
       <Project>{0AAED0AB-DB45-4AC5-95DD-B7BF65EA0024}</Project>

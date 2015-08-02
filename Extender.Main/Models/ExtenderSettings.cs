@@ -1,23 +1,27 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using GalaSoft.MvvmLight;
 using WinApiWrapper.Interfaces;
 
-namespace Extender.Main.ViewModels
+namespace Extender.Main.Models
 {
     public class ExtenderSettings : ObservableObject
     {
         private bool _isStarted;
-        private double _clickDelay;
+        private long _clickDelay;
         private int _bonusDelay;
         private IWinApiWindow _gameWindow;
         private Point _clickPoint;
 
         public ExtenderSettings()
         {
+            BonusItemsObservableCollection = new BonusItemsObservableCollection("bonuses.json");
             IsStarted = false;
             ClickDelay = 1000;
             BonusDelay = 5000;
         }
+
+        public BonusItemsObservableCollection BonusItemsObservableCollection { get; set; }
 
         public bool IsStarted
         {
@@ -29,7 +33,7 @@ namespace Extender.Main.ViewModels
             }
         }
 
-        public double ClickDelay
+        public long ClickDelay
         {
             get { return _clickDelay; }
             set
@@ -49,6 +53,8 @@ namespace Extender.Main.ViewModels
             }
         }
 
+        public event Action<IWinApiWindow> GameWindowChanged;
+
         public IWinApiWindow GameWindow
         {
             get { return _gameWindow; }
@@ -56,6 +62,7 @@ namespace Extender.Main.ViewModels
             {
                 _gameWindow = value;
                 RaisePropertyChanged(() => GameWindow);
+                OnGameWindowChanged(value);
             }
         }
 
@@ -67,6 +74,11 @@ namespace Extender.Main.ViewModels
                 _clickPoint = value;
                 RaisePropertyChanged(() => ClickPoint);
             }
+        }
+
+        protected virtual void OnGameWindowChanged(IWinApiWindow gameWindow)
+        {
+            GameWindowChanged?.Invoke(gameWindow);
         }
     }
 }

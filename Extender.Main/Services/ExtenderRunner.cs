@@ -2,13 +2,11 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Extender.Main.Enums;
 using Extender.Main.Helpers;
 using Extender.Main.Models;
-using Extender.Main.ViewModels;
 using WinApiWrapper.Enums;
 using WinApiWrapper.Interfaces;
 using WinApiWrapper.Unsafe;
@@ -16,33 +14,37 @@ using WinApiWrapper.Wrappers;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
-namespace Extender.Main.Classes
+namespace Extender.Main.Services
 {
     internal class ExtenderRunner
     {
-        private readonly BonusKeeper _bonusKeeper;
         private readonly ExtenderSettings _settings;
+        private readonly RunnerDispatcher _dispatcher;
 
         private readonly IWinApiMouse _mouse;
-        private readonly Stopwatch _bonusStopwatch;
         private bool _canRecordBonus;
 
-        public ExtenderRunner(ExtenderSettings settings, BonusKeeper bonusKeeper)
+        public ExtenderRunner(ExtenderSettings settings)
         {
             _settings = settings;
-            _bonusKeeper = bonusKeeper;
             _mouse = new WinApiMouse();
-            _bonusStopwatch = new Stopwatch();
+
+            _dispatcher = new RunnerDispatcher();
+            _dispatcher.Add(DispatcherItemId.BonusFish, RunBonusClicker, _settings.BonusDelay, false);
+            _dispatcher.Add(DispatcherItemId.MainClick, RunEnemyClicker, _settings.ClickDelay, false);
+            _dispatcher.Add(DispatcherItemId.FindGameWindow, FindGameWindow, 1000);
+            _dispatcher.Add(DispatcherItemId.Watcher, RunWatcher, 1000);
         }
 
-        [STAThread]
+
         public bool Start()
         {
             _canRecordBonus = true;
+            _settings.IsStarted = true;
             if (Initialize())
             {
-                _bonusStopwatch.Restart();
-                Task.Run((Action)RunEnemyClicker);
+                _dispatcher.Resume(DispatcherItemId.BonusFish);
+                _dispatcher.Resume(DispatcherItemId.MainClick);
                 return true;
             }
             return false;
@@ -51,13 +53,15 @@ namespace Extender.Main.Classes
         public void Stop()
         {
             _canRecordBonus = false;
-            _bonusStopwatch.Reset();
+            _settings.IsStarted = false;
+            _dispatcher.Pause(DispatcherItemId.BonusFish);
+            _dispatcher.Pause(DispatcherItemId.MainClick);
         }
         
 
         private bool Initialize()
         {
-            if (FindGameWindow())
+            if (_settings.GameWindow != null)
             {
                 AdjustWindowSize();
                 FindClickLocation();
@@ -66,17 +70,19 @@ namespace Extender.Main.Classes
             return false;
         }
 
-        private bool FindGameWindow()
+        private void FindGameWindow()
         {
-            var gameWindowList = WinApiWindow.EnumWindows(IsGameWindow).ToList();
-            _settings.GameWindow = gameWindowList.FirstOrDefault();
-            if (_settings.GameWindow != null)
+            if (_settings.GameWindow == null ||
+                !WinApiWindow.EnumWindows(w => w.Hwnd == _settings.GameWindow.Hwnd).Any())
             {
-                Debug.WriteLine("FindGameWindow: {0} ({1} x {2})", _settings.GameWindow.Title,
-                                _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
-                return true;
+                var gameWindowList = WinApiWindow.EnumWindows(IsGameWindow).ToList();
+                _settings.GameWindow = gameWindowList.FirstOrDefault();
+                if (_settings.GameWindow != null)
+                {
+                    Debug.WriteLine("FindGameWindow: {0} ({1} x {2})", _settings.GameWindow.Title,
+                                    _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
+                }
             }
-            return false;
         }
 
         private static bool IsGameWindow(IWinApiWindow window)
@@ -96,6 +102,7 @@ namespace Extender.Main.Classes
             // TODO: KG - Save Client Size to Configuration File
             // TODO: KG - Read Client Size from Configuration File
             // TODO: KG - Display Client Size in UI (Allow to change it)
+
             var rect = new NativeMethods.Structs.RECT(0, 0, _settings.GameWindow.ClientSize.Width,
                                                       _settings.GameWindow.ClientSize.Height);
             var styles = NativeMethods.User32.GetWindowLong(_settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_STYLE);
@@ -125,36 +132,30 @@ namespace Extender.Main.Classes
 
         private void RunEnemyClicker()
         {
-            while (_settings.IsStarted)
+            if (!_mouse.IsRightButtonDown)
             {
-                if (!_mouse.IsRightButtonDown)
-                {
-                    if (BonusClickDelayExpired())
-                    {
-                        foreach (var bonus in _bonusKeeper)
-                        {
-                            ClickAtPoint(bonus.Position);
-                        }
-                    }
-                    ClickAtPoint(_settings.ClickPoint);
-                }
-                else if (CanRecordBonusItem())
-                {
-                    RecordBonusItem();
-                }
-
-                Thread.Sleep(TimeSpan.FromMilliseconds(_settings.ClickDelay));
+                ClickAtPoint(_settings.ClickPoint);
+            }
+            else if (CanRecordBonusItem())
+            {
+                 RecordBonusItem();
             }
         }
 
-        private bool BonusClickDelayExpired()
+        private void RunWatcher()
         {
-            var isExpired = _bonusStopwatch.ElapsedMilliseconds >= _settings.BonusDelay;
-            if (isExpired)
+            _dispatcher.ChangeDelay(DispatcherItemId.MainClick, _settings.ClickDelay);
+        }
+
+        private void RunBonusClicker()
+        {
+            if (!_mouse.IsRightButtonDown)
             {
-                _bonusStopwatch.Restart();
+                foreach (var bonus in _settings.BonusItemsObservableCollection)
+                {
+                    ClickAtPoint(bonus.Position);
+                }
             }
-            return isExpired;
         }
 
         private bool CanRecordBonusItem()
@@ -192,7 +193,7 @@ namespace Extender.Main.Classes
                 new Point(mousePosition.X, mousePosition.Y),
                 new Size(_settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height));
 
-            if (_bonusKeeper.Add(bonusItem))
+            if (_settings.BonusItemsObservableCollection.Add(bonusItem))
             {
                 ClickAtPoint(bonusItem.Position);
             }
@@ -200,7 +201,10 @@ namespace Extender.Main.Classes
 
         private void ClickAtPoint(Point point)
         {
-            _mouse.PerformClick(WinApiMouseButton.Left, _settings.GameWindow.Hwnd, point);
+            if (_settings.GameWindow != null)
+            {
+                _mouse.PerformClick(WinApiMouseButton.Left, point, _settings.GameWindow.Hwnd);
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using Extender.Main.Classes;
-using Extender.Main.ViewModels;
+﻿using Extender.Main.ViewModels;
 
 namespace Extender.Main.Windows
 {
@@ -10,6 +8,12 @@ namespace Extender.Main.Windows
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var mainWindowViewModel = DataContext as MainWindowViewModel;
+            mainWindowViewModel?.Exit();
         }
     }
 }
