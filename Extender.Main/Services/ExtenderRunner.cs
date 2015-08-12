@@ -6,7 +6,9 @@ using System.Windows;
 using System.Windows.Input;
 using Extender.Main.Enums;
 using Extender.Main.Helpers;
+using Extender.Main.Messages;
 using Extender.Main.Models;
+using GalaSoft.MvvmLight.Messaging;
 using WinApiWrapper.Enums;
 using WinApiWrapper.Interfaces;
 using WinApiWrapper.Unsafe;
@@ -31,12 +33,13 @@ namespace Extender.Main.Services
 
             _dispatcher = new RunnerDispatcher();
             _dispatcher.Add(DispatcherItemId.BonusFish, RunBonusClicker, _settings.BonusDelay, false);
-            _dispatcher.Add(DispatcherItemId.MainClick, RunEnemyClicker, _settings.ClickDelay, false);
+            _dispatcher.Add(DispatcherItemId.MainClick, RunEnemyClicker, _settings.AttackDelay, false);
             _dispatcher.Add(DispatcherItemId.FindGameWindow, FindGameWindow, 1000);
             _dispatcher.Add(DispatcherItemId.Watcher, RunWatcher, 1000);
+            _dispatcher.Add(DispatcherItemId.SaveSettings, SaveSettings, 2000);
         }
 
-
+        
         public bool Start()
         {
             _canRecordBonus = true;
@@ -99,21 +102,27 @@ namespace Extender.Main.Services
 
         private void AdjustWindowSize()
         {
-            // TODO: KG - Save Client Size to Configuration File
-            // TODO: KG - Read Client Size from Configuration File
             // TODO: KG - Display Client Size in UI (Allow to change it)
 
-            var rect = new NativeMethods.Structs.RECT(0, 0, _settings.GameWindow.ClientSize.Width,
-                                                      _settings.GameWindow.ClientSize.Height);
+            if (_settings.WindowSize.IsEmpty)
+            {
+                _settings.WindowSize = new Size(
+                    _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
+            }
+
+            var windowRect = new NativeMethods.Structs.RECT(
+                0, 0, _settings.WindowSize.Width, _settings.WindowSize.Height);
+
             var styles = NativeMethods.User32.GetWindowLong(_settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_STYLE);
-            var exStyles = NativeMethods.User32.GetWindowLong(_settings.GameWindow.Hwnd,
-                                                              NativeMethods.Enums.GWL.GWL_EXSTYLE);
+            var exStyles = NativeMethods.User32.GetWindowLong(
+                _settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_EXSTYLE);
             var hasMenu = NativeMethods.User32.GetMenu(_settings.GameWindow.Hwnd);
-            if (NativeMethods.User32.AdjustWindowRectEx(ref rect, (uint)styles, hasMenu != IntPtr.Zero, (uint)exStyles))
+
+            if (NativeMethods.User32.AdjustWindowRectEx(ref windowRect, (uint) styles, hasMenu != IntPtr.Zero, (uint) exStyles))
             {
                 _settings.GameWindow.Size = new Rectangle(
-                    _settings.GameWindow.Size.X, _settings.GameWindow.Size.Y, rect.Right - rect.Left,
-                    rect.Bottom - rect.Top);
+                    _settings.GameWindow.Size.X, _settings.GameWindow.Size.Y,
+                    windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);
             }
         }
 
@@ -144,7 +153,13 @@ namespace Extender.Main.Services
 
         private void RunWatcher()
         {
-            _dispatcher.ChangeDelay(DispatcherItemId.MainClick, _settings.ClickDelay);
+            _dispatcher.ChangeDelay(DispatcherItemId.MainClick, _settings.AttackDelay);
+            _dispatcher.ChangeDelay(DispatcherItemId.BonusFish, _settings.BonusDelay);
+        }
+
+        private void SaveSettings()
+        {
+            _settings.Save();
         }
 
         private void RunBonusClicker()

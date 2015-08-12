@@ -5,28 +5,161 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:designMocks="clr-namespace:Extender.Main.DesignMocks"
         mc:Ignorable="d"
-        Title="ClickerBot" Height="350" Width="525" Closing="Window_Closing">
+        Title="ClickerBot for Clicker Heroes"
+        Width="450" MinWidth="250"
+        Height="325" MinHeight="212"
+        Closing="Window_Closing"
+        x:Name="MyMainWindow">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+        <Style x:Key="EdgeButton" TargetType="Button">
+            <Setter Property="Padding" Value="0,2,0,0" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ControlTemplate.Resources>
+                            <Brush x:Key="LineColor">CornflowerBlue</Brush>
+                            <Brush x:Key="LineColorDisabled">LightGray</Brush>
+                            <Brush x:Key="TextColor">White</Brush>
+                        </ControlTemplate.Resources>
+                        <Border x:Name="border" Background="Transparent" Padding="{TemplateBinding Padding}"
+                                BorderThickness="0" BorderBrush="{TemplateBinding BorderBrush}"
+                                Cursor="{TemplateBinding Cursor}">
+                            <StackPanel>
+                                <TextBlock x:Name="text" Text="{TemplateBinding Content}" Foreground="{StaticResource TextColor}"
+                                           FontWeight="{TemplateBinding FontWeight}" Padding="5,0,5,1" />
+                                <Rectangle x:Name="line" Height="5" Fill="{StaticResource LineColor}" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource LineColor}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="line" Property="Fill" Value="{StaticResource LineColorDisabled}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid d:DataContext="{d:DesignInstance Type=designMocks:MainWindowViewModelMock, IsDesignTimeCreatable=True}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        
-        <Button x:Name="StartStopButton" Content="{Binding StartStopCurrentLabel}"
-                Padding="15,5,15,5" Margin="10"
-                IsEnabled="{Binding IsStartStopEnabled}"
-                Command="{Binding StartStopCommand}" />
-        <Slider x:Name="ClickDelaySlider" Grid.Row="0" Grid.Column="1" Margin="10" VerticalAlignment="Center"
-                Minimum="1" Maximum="5000" Value="{Binding ClickDelay}" SmallChange="10" LargeChange="1000"
-                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Interval="100" />
-        <TextBlock Grid.Column="2" Grid.Row="0" Text="{Binding ElementName=ClickDelaySlider, Path=Value}" VerticalAlignment="Center"/>
-        <TextBlock Grid.Column="3" Grid.Row="0" Text=" ms" VerticalAlignment="Center" Margin="0,0,10,0"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel DockPanel.Dock="Top" Margin="10,10,10,0">
+                <GroupBox Header="Configurations" Padding="5,10,5,5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="5" />
+                            <CheckBox Content="Attack Delay: " FontWeight="Bold" VerticalAlignment="Bottom"
+                                      IsChecked="{Binding IsAttackEnabled}" ToolTip="Enable Automatic Attack" />
+                            <TextBlock Text="{Binding ElementName=AttackDelaySlider, Path=Value}" />
+                            <TextBlock Text=" ms" />
+                        </StackPanel>
+                        <Rectangle Height="5" />
+                        <Slider x:Name="AttackDelaySlider" VerticalAlignment="Center"
+                                Visibility="{Binding IsAttackEnabled, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Minimum="1" Maximum="1000" Value="{Binding AttackDelay}"
+                                TickPlacement="BottomRight" Ticks="1,100,200,300,400,500,600,700,800,900,1000"
+                                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" ToolTip="Delay between attacks" UseLayoutRounding="False" />
+
+                        <Rectangle Height="5 " />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="5" />
+                            <CheckBox Content="Bonus Delay: " FontWeight="Bold" VerticalAlignment="Bottom"
+                                      IsChecked="{Binding IsBonusEnabled}"
+                                      ToolTip="Enable Automatic Bonuses Gathering" />
+                            <TextBlock Text="{Binding ElementName=BonusDelaySlider, Path=Value}" />
+                            <TextBlock Text=" ms" />
+                        </StackPanel>
+                        <Rectangle Height="5" />
+                        <Slider x:Name="BonusDelaySlider" VerticalAlignment="Center"
+                                Visibility="{Binding IsBonusEnabled, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Minimum="1000" Maximum="5000" Value="{Binding BonusDelay}"
+                                TickPlacement="BottomRight" TickFrequency="500"
+                                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"
+                                ToolTip="Delay between bonus gathering clicks" />
+                    </StackPanel>
+                </GroupBox>
+
+                <Rectangle Height="10" />
+
+                <GroupBox Header="Game Window Information" Padding="5,10,5,5">
+                    <ContentControl>
+                        <ContentControl.Style>
+                            <Style TargetType="{x:Type ContentControl}">
+                                <Style.Resources>
+                                    <DataTemplate x:Key="GameWindowInfoTemplate">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition MinWidth="100" Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Title" FontWeight="Bold" />
+                                            <TextBlock Grid.Column="1" Grid.Row="0"
+                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowTitle}" />
+
+                                            <Separator Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" />
+
+                                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Handle" FontWeight="Bold" />
+                                            <TextBlock Grid.Column="1" Grid.Row="2"
+                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowHandle}" />
+
+                                            <Separator Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
+
+                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Position" FontWeight="Bold" />
+                                            <TextBlock Grid.Column="1" Grid.Row="4"
+                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowSize}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                    <DataTemplate x:Key="GameWindowNotFoundTemplate">
+                                        <Grid>
+                                            <TextBlock HorizontalAlignment="Center" Text="Game Window not found" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </Style.Resources>
+
+                                <Setter Property="ContentTemplate" Value="{StaticResource GameWindowInfoTemplate}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowSize.IsEmpty}" Value="True">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource GameWindowNotFoundTemplate}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
+                </GroupBox>
+                <Rectangle Height="10" />
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="1" Background="#4E6083" Padding="10,0,10,0">
+            <DockPanel>
+                <Button DockPanel.Dock="Left" Style="{StaticResource EdgeButton}" Content="Bonuses" />
+                <Rectangle Width="10"/>
+                <Button DockPanel.Dock="Right" Style="{StaticResource EdgeButton}" Content="{Binding StartStopCurrentLabel}"
+                        IsEnabled="{Binding IsStartStopEnabled}"
+                        Command="{Binding StartStopCommand}" />
+                <Rectangle Width="10" />
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>

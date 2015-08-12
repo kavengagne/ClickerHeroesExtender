@@ -91,12 +91,15 @@
     <Compile Include="DesignMocks\MainWindowViewModelMock.cs" />
     <Compile Include="Models\DispatcherItem.cs" />
     <Compile Include="Enums\DispatcherItemId.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Repositories\SettingsRepository.cs" />
     <Compile Include="Services\RunnerDispatcher.cs" />
     <Compile Include="Models\BonusItem.cs" />
     <Compile Include="Models\BonusItemsObservableCollection.cs" />
     <Compile Include="Helpers\ExceptionWrapper.cs" />
     <Compile Include="Services\ExtenderRunner.cs" />
     <Compile Include="Models\ExtenderSettings.cs" />
+    <Compile Include="Messages\GameWindowChangedMessage.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -132,7 +135,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Classes\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">

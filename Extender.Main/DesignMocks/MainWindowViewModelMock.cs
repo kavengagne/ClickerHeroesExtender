@@ -1,3 +1,5 @@
+using System;
+using System.Drawing;
 using System.Windows.Input;
 
 namespace Extender.Main.DesignMocks
@@ -6,10 +8,22 @@ namespace Extender.Main.DesignMocks
     {
         public string StartStopCurrentLabel => "Start";
 
-        public long ClickDelay { get; set; } = 1000;
+        public long AttackDelay { get; set; } = 1000;
 
         public ICommand StartStopCommand { get; set; }
 
         public bool IsStartStopEnabled => true;
+
+        public long BonusDelay { get; set; } = 5000;
+
+        public bool IsAttackEnabled { get; set; } = true;
+
+        public bool IsBonusEnabled { get; set; } = true;
+
+        public string WindowTitle { get; set; } = "Clicker Heroes";
+
+        public IntPtr WindowHandle { get; set; } = new IntPtr(1234523123);
+
+        public Size WindowSize { get; set; } = new Size(1152, 690);
     }
 }

@@ -35,5 +35,26 @@ namespace Extender.Main.Models
                 RaisePropertyChanged(() => WindowSize);
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((BonusItem) obj);
+        }
+
+        protected bool Equals(BonusItem other)
+        {
+            return Position.Equals(other.Position) && WindowSize.Equals(other.WindowSize);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Position.GetHashCode()*397) ^ WindowSize.GetHashCode();
+            }
+        }
     }
 }

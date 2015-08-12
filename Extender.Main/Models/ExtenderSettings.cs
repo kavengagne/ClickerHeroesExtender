@@ -1,6 +1,8 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
+using Extender.Main.Messages;
+using Extender.Main.Repositories;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using WinApiWrapper.Interfaces;
 
 namespace Extender.Main.Models
@@ -8,20 +10,28 @@ namespace Extender.Main.Models
     public class ExtenderSettings : ObservableObject
     {
         private bool _isStarted;
-        private long _clickDelay;
-        private int _bonusDelay;
         private IWinApiWindow _gameWindow;
         private Point _clickPoint;
+        private readonly SettingsRepository _settingsRepository;
+
 
         public ExtenderSettings()
         {
-            BonusItemsObservableCollection = new BonusItemsObservableCollection("bonuses.json");
+            _settingsRepository = new SettingsRepository("settings.json");
             IsStarted = false;
-            ClickDelay = 1000;
-            BonusDelay = 5000;
         }
 
-        public BonusItemsObservableCollection BonusItemsObservableCollection { get; set; }
+        public BonusItemsObservableCollection BonusItemsObservableCollection => _settingsRepository.BonusItems;
+
+        public Size WindowSize
+        {
+            get { return _settingsRepository.WindowSize; }
+            set
+            {
+                _settingsRepository.WindowSize = value;
+                RaisePropertyChanged(() => WindowSize);
+            }
+        }
 
         public bool IsStarted
         {
@@ -33,27 +43,45 @@ namespace Extender.Main.Models
             }
         }
 
-        public long ClickDelay
+        public long AttackDelay
         {
-            get { return _clickDelay; }
+            get { return _settingsRepository.AttackDelay; }
             set
             {
-                _clickDelay = value;
-                RaisePropertyChanged(() => ClickDelay);
+                _settingsRepository.AttackDelay = value;
+                RaisePropertyChanged(() => AttackDelay);
             }
         }
 
-        public int BonusDelay
+        public long BonusDelay
         {
-            get { return _bonusDelay; }
+            get { return _settingsRepository.BonusDelay; }
             set
             {
-                _bonusDelay = value;
+                _settingsRepository.BonusDelay = value;
                 RaisePropertyChanged(() => BonusDelay);
             }
         }
 
-        public event Action<IWinApiWindow> GameWindowChanged;
+        public bool IsAttackEnabled
+        {
+            get { return _settingsRepository.IsAttackEnabled; }
+            set
+            {
+                _settingsRepository.IsAttackEnabled = value;
+                RaisePropertyChanged(() => IsAttackEnabled);
+            }
+        }
+
+        public bool IsBonusEnabled
+        {
+            get { return _settingsRepository.IsBonusEnabled; }
+            set
+            {
+                _settingsRepository.IsBonusEnabled = value;
+                RaisePropertyChanged(() => IsBonusEnabled);
+            }
+        }
 
         public IWinApiWindow GameWindow
         {
@@ -62,7 +90,7 @@ namespace Extender.Main.Models
             {
                 _gameWindow = value;
                 RaisePropertyChanged(() => GameWindow);
-                OnGameWindowChanged(value);
+                Messenger.Default.Send(new GameWindowChangedMessage(_gameWindow));
             }
         }
 
@@ -76,9 +104,10 @@ namespace Extender.Main.Models
             }
         }
 
-        protected virtual void OnGameWindowChanged(IWinApiWindow gameWindow)
+
+        public void Save()
         {
-            GameWindowChanged?.Invoke(gameWindow);
+            _settingsRepository.SaveToDisk();
         }
     }
 }

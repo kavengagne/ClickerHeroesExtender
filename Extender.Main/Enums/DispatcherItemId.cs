@@ -5,6 +5,7 @@ namespace Extender.Main.Enums
         MainClick = 0,
         BonusFish,
         Watcher,
-        FindGameWindow
+        FindGameWindow,
+        SaveSettings
     }
 }
