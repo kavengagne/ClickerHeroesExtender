@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
 using Extender.Main.Enums;
 using Extender.Main.Helpers;
 using Extender.Main.Messages;
@@ -13,8 +9,7 @@ using WinApiWrapper.Enums;
 using WinApiWrapper.Interfaces;
 using WinApiWrapper.Unsafe;
 using WinApiWrapper.Wrappers;
-using Point = System.Drawing.Point;
-using Size = System.Drawing.Size;
+
 
 namespace Extender.Main.Services
 {
@@ -24,7 +19,6 @@ namespace Extender.Main.Services
         private readonly RunnerDispatcher _dispatcher;
 
         private readonly IWinApiMouse _mouse;
-        private bool _canRecordBonus;
 
         public ExtenderRunner(ExtenderSettings settings)
         {
@@ -35,14 +29,14 @@ namespace Extender.Main.Services
             _dispatcher.Add(DispatcherItemId.BonusFish, RunBonusClicker, _settings.BonusDelay, false);
             _dispatcher.Add(DispatcherItemId.MainClick, RunEnemyClicker, _settings.AttackDelay, false);
             _dispatcher.Add(DispatcherItemId.FindGameWindow, FindGameWindow, 1000);
-            _dispatcher.Add(DispatcherItemId.Watcher, RunWatcher, 1000);
+            _dispatcher.Add(DispatcherItemId.DelayWatcher, RunDelayWatcher, 1000);
+            _dispatcher.Add(DispatcherItemId.WindowWatcher, RunWindowWatcher, 2000);
             _dispatcher.Add(DispatcherItemId.SaveSettings, SaveSettings, 2000);
         }
 
-        
+
         public bool Start()
         {
-            _canRecordBonus = true;
             _settings.IsStarted = true;
             if (Initialize())
             {
@@ -55,7 +49,6 @@ namespace Extender.Main.Services
 
         public void Stop()
         {
-            _canRecordBonus = false;
             _settings.IsStarted = false;
             _dispatcher.Pause(DispatcherItemId.BonusFish);
             _dispatcher.Pause(DispatcherItemId.MainClick);
@@ -67,7 +60,6 @@ namespace Extender.Main.Services
             if (_settings.GameWindow != null)
             {
                 AdjustWindowSize();
-                FindClickLocation();
                 return true;
             }
             return false;
@@ -75,35 +67,35 @@ namespace Extender.Main.Services
 
         private void FindGameWindow()
         {
-            if (_settings.GameWindow == null ||
-                !WinApiWindow.EnumWindows(w => w.Hwnd == _settings.GameWindow.Hwnd).Any())
+            IWinApiWindow window = WinApiWindow.Find("ApolloRuntimeContentWindow", "Clicker Heroes");
+            if (window == null)
             {
-                var gameWindowList = WinApiWindow.EnumWindows(IsGameWindow).ToList();
-                _settings.GameWindow = gameWindowList.FirstOrDefault();
-                if (_settings.GameWindow != null)
-                {
-                    Debug.WriteLine("FindGameWindow: {0} ({1} x {2})", _settings.GameWindow.Title,
-                                    _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
-                }
+                _settings.GameWindow = null;
             }
+            else if (_settings.GameWindow != window)
+            {
+                _settings.GameWindow = window;
+            }
+            FindClickLocation();
         }
 
-        private static bool IsGameWindow(IWinApiWindow window)
+        private void FindClickLocation()
         {
-            bool isGameWindow = false;
-            ExceptionWrapper.TrySafe<Exception>(
-                () => isGameWindow = window.IsDesktopWindow
-                                     && !String.IsNullOrWhiteSpace(window.Title)
-                                     && window.Title.Contains("Clicker Heroes")
-                                     && window.ClassName.Contains("ApolloRuntimeContentWindow"),
-                ex => MessageBox.Show(ex.ToString()));
-            return isGameWindow;
+            if (_settings.GameWindow == null)
+            {
+                _settings.ClickPoint = Point.Empty;
+                return;
+            }
+
+            var clickPointRatio = new PointF(3 / 4f, 1 / 2f);
+            var areaSize = SizeHelper.GetGameAreaRectangle(_settings.GameWindow.ClientSize);
+
+            _settings.ClickPoint = new Point((int)(areaSize.Width * clickPointRatio.X + areaSize.X),
+                                             (int)(areaSize.Height * clickPointRatio.Y + areaSize.Y));
         }
 
         private void AdjustWindowSize()
         {
-            // TODO: KG - Display Client Size in UI (Allow to change it)
-
             if (_settings.WindowSize.IsEmpty)
             {
                 _settings.WindowSize = new Size(
@@ -126,35 +118,24 @@ namespace Extender.Main.Services
             }
         }
 
-        private void FindClickLocation()
-        {
-            // TODO: KG - Should call every 5 seconds or so.
-            if (_settings.GameWindow != null)
-            {
-                var size = _settings.GameWindow.ClientSize;
-                _settings.ClickPoint = new Point((int)(size.Width * (3 / 4d)), (int)(size.Height * (1 / 2d)));
-                Debug.WriteLine("Windows is at X: {0}, Y: {1}, Width: {2}, Height: {3}", size.X, size.Y, size.Width,
-                                size.Height);
-                Debug.WriteLine("Click Point is at {0} x {1}", _settings.ClickPoint.X, _settings.ClickPoint.Y);
-            }
-        }
-
         private void RunEnemyClicker()
         {
-            if (!_mouse.IsRightButtonDown)
+            // TODO: KG - Change key here when override key will be modifiable
+            if (!_mouse.IsRightButtonDown && _settings.IsAttackEnabled)
             {
                 ClickAtPoint(_settings.ClickPoint);
             }
-            else if (CanRecordBonusItem())
-            {
-                 RecordBonusItem();
-            }
         }
 
-        private void RunWatcher()
+        private void RunDelayWatcher()
         {
             _dispatcher.ChangeDelay(DispatcherItemId.MainClick, _settings.AttackDelay);
             _dispatcher.ChangeDelay(DispatcherItemId.BonusFish, _settings.BonusDelay);
+        }
+
+        private void RunWindowWatcher()
+        {
+            Messenger.Default.Send(new GameWindowChangedMessage(_settings.GameWindow));
         }
 
         private void SaveSettings()
@@ -164,53 +145,12 @@ namespace Extender.Main.Services
 
         private void RunBonusClicker()
         {
-            if (!_mouse.IsRightButtonDown)
+            if (!_mouse.IsRightButtonDown && _settings.IsBonusEnabled)
             {
                 foreach (var bonus in _settings.BonusItemsObservableCollection)
                 {
                     ClickAtPoint(bonus.Position);
                 }
-            }
-        }
-
-        private bool CanRecordBonusItem()
-        {
-            var isRecordKeyDown = false;
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                isRecordKeyDown = Keyboard.IsKeyDown(Key.LeftAlt);
-            });
-
-            if (isRecordKeyDown)
-            {
-                if (_canRecordBonus)
-                {
-                    _canRecordBonus = false;
-                    return true;
-                }
-            }
-            else
-            {
-                _canRecordBonus = true;
-            }
-            return false;
-        }
-
-        private void RecordBonusItem()
-        {
-            var mousePosition = _mouse.GetClientPosition(_settings.GameWindow);
-            Debug.WriteLine(
-                "Recorded Position [Mouse (X: {0}, Y: {1}) - Window (W: {2}, H: {3})]",
-                mousePosition.X, mousePosition.Y,
-                _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
-
-            var bonusItem = new BonusItem(
-                new Point(mousePosition.X, mousePosition.Y),
-                new Size(_settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height));
-
-            if (_settings.BonusItemsObservableCollection.Add(bonusItem))
-            {
-                ClickAtPoint(bonusItem.Position);
             }
         }
 

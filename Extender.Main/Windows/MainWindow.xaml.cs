@@ -1,4 +1,8 @@
-﻿using Extender.Main.ViewModels;
+﻿using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Interop;
+using Extender.Main.ViewModels;
 
 namespace Extender.Main.Windows
 {
@@ -12,6 +16,7 @@ namespace Extender.Main.Windows
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // TODO: KG - Cleanup before exit, like timer and mouse states and overlay, etc...
             var mainWindowViewModel = DataContext as MainWindowViewModel;
             mainWindowViewModel?.Exit();
         }

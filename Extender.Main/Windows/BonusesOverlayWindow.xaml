@@ -1,0 +1,122 @@
+﻿<Window x:Class="Extender.Main.Windows.BonusesOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:Extender.Main.Models"
+        xmlns:designMocks="clr-namespace:Extender.Main.DesignMocks"
+        xmlns:converters="clr-namespace:Extender.Main.Converters"
+        mc:Ignorable="d"
+        Width="500" Height="350"
+        ShowActivated="True"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        Background="#60DDDDDD"
+        Topmost="True"
+        BorderThickness="0"
+        BorderBrush="Red"
+        UseLayoutRounding="True"
+        MouseLeftButtonUp="Window_OnMouseLeftButtonUp">
+    
+    <Window.Resources>
+        <converters:PointToThicknessConverter x:Key="PointToThicknessConverter" />
+        
+        <Style x:Key="OverlayItemsContainerStyle" TargetType="ItemsControl">
+        </Style>
+
+        <Style x:Key="BonusButtonStyle" TargetType="ToggleButton">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <Button Width="12" Height="12"
+                                    Margin="0,-45,-13,0" Padding="0"
+                                    Background="Transparent" Click="DeleteBonusItem_OnClick">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid>
+                                            <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                       Fill="Black" Stroke="Black" StrokeThickness="1.3" />
+                                            <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="2" Fill="Red"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                                <Rectangle.RenderTransform>
+                                                    <RotateTransform Angle="45"></RotateTransform>
+                                                </Rectangle.RenderTransform>
+                                            </Rectangle>
+                                            <Rectangle HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Fill="Red"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                                <Rectangle.RenderTransform>
+                                                    <RotateTransform Angle="45"></RotateTransform>
+                                                </Rectangle.RenderTransform>
+                                            </Rectangle>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Border x:Name="border" CornerRadius="15"
+                                    Width="30" Height="30"
+                                    BorderThickness="1"
+                                    BorderBrush="Black" Background="CornflowerBlue"
+                                    Margin="-15,-15,0,0" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="Red"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Canvas x:Name="canvas"
+            d:DataContext="{d:DesignInstance Type=designMocks:BonusOverlayMock, IsDesignTimeCreatable=True}">
+
+
+        <RichTextBox Canvas.Top="20" Canvas.Right="20"
+                     Width="250"
+                     Foreground="{StaticResource EdgeButtonTextColor}"
+                     Background="{StaticResource EdgeBarBackgroundColor}"
+                     Padding="0,10,0,10">
+            <FlowDocument>
+                <List Padding="25,0,0,0" MarkerStyle="Square" MarkerOffset="5">
+                    <ListItem Margin="0,0,0,8">
+                        <Paragraph>Click on the overlay to <Bold>ADD</Bold> a bonus point.</Paragraph>
+                    </ListItem>
+                    <ListItem Margin="0,0,0,8">
+                        <Paragraph>Click on the <Bold>X</Bold> button to delete one.</Paragraph>
+                    </ListItem>
+                    <ListItem Margin="0,0,0,8">
+                        <Paragraph>Click on a Bonus Point to toggle <Bold>Edit Mode</Bold>.</Paragraph>
+                    </ListItem>
+                </List>
+            </FlowDocument>
+        </RichTextBox>
+
+
+        <ItemsControl x:Name="ItemsList" ItemsSource="{Binding BonusItems}" Style="{StaticResource OverlayItemsContainerStyle}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="models:BonusItem">
+                    <ToggleButton Style="{StaticResource BonusButtonStyle}"
+                                  Click="BonusItem_OnClick"
+                                  MouseMove="BonusItem_OnMouseMove"
+                                  Margin="{Binding Position, Converter={StaticResource PointToThicknessConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    </ToggleButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </Canvas>
+</Window>

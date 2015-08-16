@@ -4,30 +4,35 @@ using System.Windows.Input;
 using Extender.Main.Messages;
 using Extender.Main.Models;
 using Extender.Main.Services;
+using Extender.Main.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 
+
 namespace Extender.Main.ViewModels
 {
-    // TODO: KG - Add a list that shows the Bonuses.
-    // TODO: KG - Show Bonuses Position on screen and make them editable/deletable.
-    // TODO: KG - Add a list that shows the Bonuses.
+    // TODO: KG - Allow changing GameWindow Size from UI.
     // TODO: KG - Allow changing the Override Key.
-    // TODO: KG - Save Configuration like last GameWindow Size and Position.
 
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly ExtenderRunner _extenderRunner;
         private readonly ExtenderSettings _settings;
+
+        private readonly BonusesOverlayWindow _bonusesOverlay;
+        
         
         private string _startStopCurrentLabel;
 
         private ICommand _startStopCommand;
+        private ICommand _showBonusesOverlayCommand;
+
         private bool _isStartStopEnabled;
         private string _windowTitle;
         private IntPtr _windowHandle;
         private Size _windowSize;
+        private bool _isShowingBonusesOverlay;
 
 
         public MainWindowViewModel()
@@ -36,6 +41,11 @@ namespace Extender.Main.ViewModels
 
             _settings = new ExtenderSettings();
             _extenderRunner = new ExtenderRunner(_settings);
+
+            _bonusesOverlay = new BonusesOverlayWindow(_settings)
+            {
+                DataContext = new BonusOverlayViewModel(_settings)
+            };
 
             SetStartStopLabel(false);
         }
@@ -133,17 +143,17 @@ namespace Extender.Main.ViewModels
             }
         }
 
+       
         public ICommand StartStopCommand
-            => _startStopCommand ?? (_startStopCommand = new RelayCommand(StartStop, CanStartStop));
+            => _startStopCommand ?? (_startStopCommand = new RelayCommand(StartStop));
+
+        public ICommand ShowBonusesOverlayCommand
+            => _showBonusesOverlayCommand ?? (_showBonusesOverlayCommand = new RelayCommand(ShowBonusesOverlay));
+
 
         public void Exit()
         {
             _extenderRunner.Stop();
-        }
-
-        private bool CanStartStop()
-        {
-            return true;
         }
 
         private void StartStop()
@@ -162,6 +172,20 @@ namespace Extender.Main.ViewModels
                 }
             }
         }
+
+        private void ShowBonusesOverlay()
+        {
+            if (_isShowingBonusesOverlay)
+            {
+                _bonusesOverlay.Hide();
+            }
+            else
+            {
+                _bonusesOverlay.Show();
+            }
+            _isShowingBonusesOverlay = !_isShowingBonusesOverlay;
+        }
+
 
         private void SetStartStopLabel(bool isEnabled)
         {

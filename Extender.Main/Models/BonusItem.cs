@@ -1,13 +1,14 @@
 ﻿using System.Drawing;
 using GalaSoft.MvvmLight;
 
+
 namespace Extender.Main.Models
 {
     public class BonusItem : ObservableObject
     {
         private Point _position;
         private Size _windowSize;
-
+        
 
         public BonusItem(Point position, Size windowSize)
         {

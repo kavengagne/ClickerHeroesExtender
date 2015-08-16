@@ -13,41 +13,6 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-
-        <Style x:Key="EdgeButton" TargetType="Button">
-            <Setter Property="Padding" Value="0,2,0,0" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Cursor" Value="Hand" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <ControlTemplate.Resources>
-                            <Brush x:Key="LineColor">CornflowerBlue</Brush>
-                            <Brush x:Key="LineColorDisabled">LightGray</Brush>
-                            <Brush x:Key="TextColor">White</Brush>
-                        </ControlTemplate.Resources>
-                        <Border x:Name="border" Background="Transparent" Padding="{TemplateBinding Padding}"
-                                BorderThickness="0" BorderBrush="{TemplateBinding BorderBrush}"
-                                Cursor="{TemplateBinding Cursor}">
-                            <StackPanel>
-                                <TextBlock x:Name="text" Text="{TemplateBinding Content}" Foreground="{StaticResource TextColor}"
-                                           FontWeight="{TemplateBinding FontWeight}" Padding="5,0,5,1" />
-                                <Rectangle x:Name="line" Height="5" Fill="{StaticResource LineColor}" />
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource LineColor}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="line" Property="Fill" Value="{StaticResource LineColorDisabled}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid d:DataContext="{d:DesignInstance Type=designMocks:MainWindowViewModelMock, IsDesignTimeCreatable=True}">
@@ -126,7 +91,7 @@
 
                                             <Separator Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
 
-                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Position" FontWeight="Bold" />
+                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Size" FontWeight="Bold" />
                                             <TextBlock Grid.Column="1" Grid.Row="4"
                                                        Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowSize}" />
                                         </Grid>
@@ -151,13 +116,15 @@
                 <Rectangle Height="10" />
             </StackPanel>
         </ScrollViewer>
-        <Border Grid.Row="1" Background="#4E6083" Padding="10,0,10,0">
+        <Border Grid.Row="1" Background="{StaticResource EdgeBarBackgroundColor}" Padding="0">
             <DockPanel>
-                <Button DockPanel.Dock="Left" Style="{StaticResource EdgeButton}" Content="Bonuses" />
+                <ToggleButton DockPanel.Dock="Left" Style="{StaticResource EdgeToggleButton}"
+                              Content="Bonuses" Command="{Binding ShowBonusesOverlayCommand}" />
                 <Rectangle Width="10"/>
-                <Button DockPanel.Dock="Right" Style="{StaticResource EdgeButton}" Content="{Binding StartStopCurrentLabel}"
-                        IsEnabled="{Binding IsStartStopEnabled}"
-                        Command="{Binding StartStopCommand}" />
+                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource EdgeToggleButton}"
+                              Content="{Binding StartStopCurrentLabel}"
+                              IsEnabled="{Binding IsStartStopEnabled}"
+                              Command="{Binding StartStopCommand}" />
                 <Rectangle Width="10" />
             </DockPanel>
         </Border>

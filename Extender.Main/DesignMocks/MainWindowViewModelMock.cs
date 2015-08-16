@@ -12,6 +12,8 @@ namespace Extender.Main.DesignMocks
 
         public ICommand StartStopCommand { get; set; }
 
+        public ICommand ShowBonusesOverlayCommand { get; set; }
+
         public bool IsStartStopEnabled => true;
 
         public long BonusDelay { get; set; } = 5000;
@@ -25,5 +27,7 @@ namespace Extender.Main.DesignMocks
         public IntPtr WindowHandle { get; set; } = new IntPtr(1234523123);
 
         public Size WindowSize { get; set; } = new Size(1152, 690);
+
+        public bool IsShowingBonusesOverlay { get; set; } = false;
     }
 }

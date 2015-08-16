@@ -1,9 +1,13 @@
 using System.Drawing;
+using GalaSoft.MvvmLight;
+
 
 namespace Extender.Main.Models
 {
-    public class SettingsModel
+    public class SettingsModel : ObservableObject
     {
+        private BonusItemsObservableCollection _bonusItems;
+
         public SettingsModel()
         {
             WindowSize = new Size();
@@ -19,7 +23,15 @@ namespace Extender.Main.Models
 
         public Size WindowSize { get; set; }
 
-        public BonusItemsObservableCollection BonusItems { get; set; }
+        public BonusItemsObservableCollection BonusItems
+        {
+            get { return _bonusItems; }
+            set
+            {
+                _bonusItems = value;
+                RaisePropertyChanged(() => BonusItems);
+            }
+        }
 
         public bool IsAttackEnabled { get; set; }
 
