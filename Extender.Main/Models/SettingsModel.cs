@@ -36,7 +36,7 @@ namespace Extender.Main.Models
         public bool IsAttackEnabled { get; set; }
 
         public long AttackDelay { get; set; }
-        
+
         public bool IsBonusEnabled { get; set; }
 
         public long BonusDelay { get; set; }

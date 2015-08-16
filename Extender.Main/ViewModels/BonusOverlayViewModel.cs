@@ -26,7 +26,6 @@ namespace Extender.Main.ViewModels
 
         private void AddBonusItem()
         {
-
         }
     }
 }

@@ -21,8 +21,8 @@ namespace Extender.Main.ViewModels
         private readonly ExtenderSettings _settings;
 
         private readonly BonusesOverlayWindow _bonusesOverlay;
-        
-        
+
+
         private string _startStopCurrentLabel;
 
         private ICommand _startStopCommand;
@@ -88,7 +88,7 @@ namespace Extender.Main.ViewModels
             get { return _settings.IsBonusEnabled; }
             set
             {
-                _settings.IsBonusEnabled = value; 
+                _settings.IsBonusEnabled = value;
                 RaisePropertyChanged(() => IsBonusEnabled);
             }
         }
@@ -143,7 +143,7 @@ namespace Extender.Main.ViewModels
             }
         }
 
-       
+
         public ICommand StartStopCommand
             => _startStopCommand ?? (_startStopCommand = new RelayCommand(StartStop));
 
@@ -189,7 +189,7 @@ namespace Extender.Main.ViewModels
 
         private void SetStartStopLabel(bool isEnabled)
         {
-            StartStopCurrentLabel = isEnabled ?  "Stop" : "Start";
+            StartStopCurrentLabel = isEnabled ? "Stop" : "Start";
         }
 
 

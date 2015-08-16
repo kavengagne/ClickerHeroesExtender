@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Point = System.Drawing.Point;
 
+
 namespace Extender.Main.Converters
 {
     [ValueConversion(typeof(Point), typeof(Thickness))]
@@ -17,7 +18,7 @@ namespace Extender.Main.Converters
             int width;
             int.TryParse(parameter as string, out width);
             int offset = width / 2;
-            
+
             return new Thickness(point.X - offset, point.Y - offset, 0, 0);
         }
 

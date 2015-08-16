@@ -5,6 +5,7 @@ using Extender.Main.Models;
 using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 
+
 namespace Extender.Main.Repositories
 {
     public class SettingsRepository : ObservableObject
@@ -35,7 +36,7 @@ namespace Extender.Main.Repositories
         }
 
         public BonusItemsObservableCollection BonusItems => _settingsModel.BonusItems;
-        
+
         public bool IsAttackEnabled
         {
             get { return _settingsModel.IsAttackEnabled; }

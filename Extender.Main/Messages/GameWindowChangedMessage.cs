@@ -1,5 +1,6 @@
 ﻿using WinApiWrapper.Interfaces;
 
+
 namespace Extender.Main.Messages
 {
     public class GameWindowChangedMessage

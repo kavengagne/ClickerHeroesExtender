@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using WinApiWrapper.Interfaces;
 
+
 namespace Extender.Main.Models
 {
     public class ExtenderSettings : ObservableObject

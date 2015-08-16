@@ -8,7 +8,7 @@ namespace Extender.Main.Models
     {
         private Point _position;
         private Size _windowSize;
-        
+
 
         public BonusItem(Point position, Size windowSize)
         {
@@ -39,10 +39,19 @@ namespace Extender.Main.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((BonusItem) obj);
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+            return Equals((BonusItem)obj);
         }
 
         protected bool Equals(BonusItem other)
@@ -54,7 +63,7 @@ namespace Extender.Main.Models
         {
             unchecked
             {
-                return (Position.GetHashCode()*397) ^ WindowSize.GetHashCode();
+                return (Position.GetHashCode() * 397) ^ WindowSize.GetHashCode();
             }
         }
     }

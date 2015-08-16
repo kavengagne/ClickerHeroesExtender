@@ -53,7 +53,7 @@ namespace Extender.Main.Services
             _dispatcher.Pause(DispatcherItemId.BonusFish);
             _dispatcher.Pause(DispatcherItemId.MainClick);
         }
-        
+
 
         private bool Initialize()
         {
@@ -110,7 +110,8 @@ namespace Extender.Main.Services
                 _settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_EXSTYLE);
             var hasMenu = NativeMethods.User32.GetMenu(_settings.GameWindow.Hwnd);
 
-            if (NativeMethods.User32.AdjustWindowRectEx(ref windowRect, (uint) styles, hasMenu != IntPtr.Zero, (uint) exStyles))
+            if (NativeMethods.User32.AdjustWindowRectEx(ref windowRect, (uint)styles, hasMenu != IntPtr.Zero,
+                                                        (uint)exStyles))
             {
                 _settings.GameWindow.Size = new Rectangle(
                     _settings.GameWindow.Size.X, _settings.GameWindow.Size.Y,

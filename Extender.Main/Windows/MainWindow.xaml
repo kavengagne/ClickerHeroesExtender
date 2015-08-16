@@ -36,7 +36,8 @@
                                 Visibility="{Binding IsAttackEnabled, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Minimum="1" Maximum="1000" Value="{Binding AttackDelay}"
                                 TickPlacement="BottomRight" Ticks="1,100,200,300,400,500,600,700,800,900,1000"
-                                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" ToolTip="Delay between attacks" UseLayoutRounding="False" />
+                                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" ToolTip="Delay between attacks"
+                                UseLayoutRounding="False" />
 
                         <Rectangle Height="5 " />
 
@@ -106,7 +107,8 @@
                                 <Setter Property="ContentTemplate" Value="{StaticResource GameWindowInfoTemplate}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding WindowSize.IsEmpty}" Value="True">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource GameWindowNotFoundTemplate}" />
+                                        <Setter Property="ContentTemplate"
+                                                Value="{StaticResource GameWindowNotFoundTemplate}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -120,7 +122,7 @@
             <DockPanel>
                 <ToggleButton DockPanel.Dock="Left" Style="{StaticResource EdgeToggleButton}"
                               Content="Bonuses" Command="{Binding ShowBonusesOverlayCommand}" />
-                <Rectangle Width="10"/>
+                <Rectangle Width="10" />
                 <ToggleButton DockPanel.Dock="Right" Style="{StaticResource EdgeToggleButton}"
                               Content="{Binding StartStopCurrentLabel}"
                               IsEnabled="{Binding IsStartStopEnabled}"

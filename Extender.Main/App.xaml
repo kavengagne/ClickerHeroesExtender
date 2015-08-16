@@ -4,10 +4,10 @@
              StartupUri="Windows/MainWindow.xaml"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
-         <ResourceDictionary>
-             <ResourceDictionary.MergedDictionaries>
-                 <ResourceDictionary Source="/Extender.Main;component/Resources/EdgeButtonStyles.xaml" />
-             </ResourceDictionary.MergedDictionaries>
-         </ResourceDictionary>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Extender.Main;component/Resources/EdgeButtonStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

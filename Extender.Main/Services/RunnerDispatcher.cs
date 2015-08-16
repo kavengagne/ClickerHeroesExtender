@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Extender.Main.Enums;
 using Extender.Main.Models;
 
+
 namespace Extender.Main.Services
 {
     public class RunnerDispatcher
@@ -21,6 +22,7 @@ namespace Extender.Main.Services
             _stopwatch = Stopwatch.StartNew();
             Start();
         }
+
 
         #region Public Methods
         public void Start()

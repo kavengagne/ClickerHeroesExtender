@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
+
 namespace Extender.Main.Models
 {
     public class BonusItemsObservableCollection : ObservableCollection<BonusItem>

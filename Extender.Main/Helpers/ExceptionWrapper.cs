@@ -1,5 +1,6 @@
 using System;
 
+
 namespace Extender.Main.Helpers
 {
     internal static class ExceptionWrapper

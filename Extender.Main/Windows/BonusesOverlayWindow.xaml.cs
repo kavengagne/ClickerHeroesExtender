@@ -36,7 +36,8 @@ namespace Extender.Main.Windows
             IsVisibleChanged += OnIsVisibleChanged;
         }
 
-        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        private void OnIsVisibleChanged(object sender,
+                                        DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             if (!IsVisible)
             {
@@ -86,7 +87,7 @@ namespace Extender.Main.Windows
         {
             if (accEvent == AccessibleEvents.LocationChange && windowHandle == _settings.GameWindow.Hwnd)
             {
-                SetOverlayPosition(); 
+                SetOverlayPosition();
             }
         }
 
@@ -102,7 +103,7 @@ namespace Extender.Main.Windows
 
                 var leftlimit = canvPosToWindow.X + (item.Width / 2);
                 var rightlimit = canvPosToWindow.X + canvas.ActualWidth - (item.Width / 2);
-                
+
                 var absmouseXpos = e.GetPosition(this).X;
                 var absmouseYpos = e.GetPosition(this).Y;
 

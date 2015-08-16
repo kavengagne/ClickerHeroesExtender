@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Extender.Main.ViewModels;
 
+
 namespace Extender.Main.Windows
 {
     public partial class MainWindow
