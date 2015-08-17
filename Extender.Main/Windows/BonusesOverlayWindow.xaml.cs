@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,10 +8,11 @@ using System.Windows.Interop;
 using Extender.Main.Helpers;
 using Extender.Main.Models;
 using Extender.Main.ViewModels;
-using WinApiWrapper.Unsafe;
-using static WinApiWrapper.Unsafe.NativeMethods.Enums;
-using MouseEventArgs = System.Windows.Input.MouseEventArgs;
-using Point = System.Windows.Point;
+using WinApiWrapper.Native.Delegates;
+using WinApiWrapper.Native.Enums;
+using WinApiWrapper.Native.Methods;
+using WinApiWrapper.Native.Structs;
+using Size = System.Drawing.Size;
 
 
 namespace Extender.Main.Windows
@@ -51,7 +50,7 @@ namespace Extender.Main.Windows
 
         private void DisableOverlay()
         {
-            NativeMethods.User32.UnhookWinEvent(_windowHook);
+            User32.UnhookWinEvent(_windowHook);
             _windowHookGcHandle.Free();
         }
 
@@ -66,18 +65,18 @@ namespace Extender.Main.Windows
             var overlayHwnd = new WindowInteropHelper(this).Handle;
             var size = SizeHelper.GetGameAreaRectangle(_settings.GameWindow.ClientSize);
 
-            var pt = new NativeMethods.Structs.POINT { x = size.X, y = size.Y };
-            NativeMethods.User32.ClientToScreen(_settings.GameWindow.Hwnd, ref pt);
+            var pt = new POINT { x = size.X, y = size.Y };
+            User32.ClientToScreen(_settings.GameWindow.Hwnd, ref pt);
 
-            NativeMethods.User32.SetWindowPos(overlayHwnd, IntPtr.Zero, pt.x, pt.y, size.Width, size.Height,
-                                              SetWindowPosFlags.FrameChanged | SetWindowPosFlags.IgnoreZOrder);
+            User32.SetWindowPos(overlayHwnd, IntPtr.Zero, pt.x, pt.y, size.Width, size.Height,
+                                SetWindowPosFlags.FrameChanged | SetWindowPosFlags.IgnoreZOrder);
         }
 
         private void SetEventHooks()
         {
-            NativeMethods.Delegates.WinEventProc eventHandler = LocationChangedCallback;
+            WinEventProc eventHandler = LocationChangedCallback;
             _windowHookGcHandle = GCHandle.Alloc(eventHandler);
-            _windowHook = NativeMethods.User32.SetWinEventHook(
+            _windowHook = User32.SetWinEventHook(
                 AccessibleEvents.LocationChange, AccessibleEvents.LocationChange, IntPtr.Zero, eventHandler
                 , 0, 0, SetWinEventHookParameter.WINEVENT_OUTOFCONTEXT);
         }
@@ -144,10 +143,13 @@ namespace Extender.Main.Windows
             var clientSize = _settings.GameWindow.ClientSize;
 
             var item = new BonusItem(new System.Drawing.Point((int)mousePosition.X, (int)mousePosition.Y),
-                                     new System.Drawing.Size(clientSize.Width, clientSize.Height));
+                                     new Size(clientSize.Width, clientSize.Height));
 
             var viewModel = DataContext as BonusOverlayViewModel;
-            viewModel?.BonusItems.Add(item);
+            lock (_settings.BonusItemsLocker)
+            {
+                viewModel?.BonusItems.Add(item);
+            }
         }
 
         private void DeleteBonusItem_OnClick(object sender, RoutedEventArgs e)
@@ -158,7 +160,10 @@ namespace Extender.Main.Windows
             if (item != null)
             {
                 var viewModel = DataContext as BonusOverlayViewModel;
-                viewModel?.BonusItems.Remove(item);
+                lock (_settings.BonusItemsLocker)
+                {
+                    viewModel?.BonusItems.Remove(item);
+                }
             }
         }
     }

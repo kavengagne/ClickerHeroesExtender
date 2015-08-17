@@ -7,7 +7,9 @@ using Extender.Main.Models;
 using GalaSoft.MvvmLight.Messaging;
 using WinApiWrapper.Enums;
 using WinApiWrapper.Interfaces;
-using WinApiWrapper.Unsafe;
+using WinApiWrapper.Native.Enums;
+using WinApiWrapper.Native.Methods;
+using WinApiWrapper.Native.Structs;
 using WinApiWrapper.Wrappers;
 
 
@@ -102,15 +104,15 @@ namespace Extender.Main.Services
                     _settings.GameWindow.ClientSize.Width, _settings.GameWindow.ClientSize.Height);
             }
 
-            var windowRect = new NativeMethods.Structs.RECT(
+            var windowRect = new RECT(
                 0, 0, _settings.WindowSize.Width, _settings.WindowSize.Height);
 
-            var styles = NativeMethods.User32.GetWindowLong(_settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_STYLE);
-            var exStyles = NativeMethods.User32.GetWindowLong(
-                _settings.GameWindow.Hwnd, NativeMethods.Enums.GWL.GWL_EXSTYLE);
-            var hasMenu = NativeMethods.User32.GetMenu(_settings.GameWindow.Hwnd);
+            var styles = User32.GetWindowLong(_settings.GameWindow.Hwnd, GetWindowLong.GWL_STYLE);
+            var exStyles = User32.GetWindowLong(
+                _settings.GameWindow.Hwnd, GetWindowLong.GWL_EXSTYLE);
+            var hasMenu = User32.GetMenu(_settings.GameWindow.Hwnd);
 
-            if (NativeMethods.User32.AdjustWindowRectEx(ref windowRect, (uint)styles, hasMenu != IntPtr.Zero,
+            if (User32.AdjustWindowRectEx(ref windowRect, (uint)styles, hasMenu != IntPtr.Zero,
                                                         (uint)exStyles))
             {
                 _settings.GameWindow.Size = new Rectangle(
@@ -148,9 +150,12 @@ namespace Extender.Main.Services
         {
             if (!_mouse.IsRightButtonDown && _settings.IsBonusEnabled)
             {
-                foreach (var bonus in _settings.BonusItemsObservableCollection)
+                lock (_settings.BonusItemsLocker)
                 {
-                    ClickAtPoint(bonus.Position);
+                    foreach (var bonus in _settings.BonusItemsObservableCollection)
+                    {
+                        ClickAtPoint(bonus.Position);
+                    }
                 }
             }
         }

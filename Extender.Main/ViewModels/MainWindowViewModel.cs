@@ -14,6 +14,7 @@ namespace Extender.Main.ViewModels
 {
     // TODO: KG - Allow changing GameWindow Size from UI.
     // TODO: KG - Allow changing the Override Key.
+    // TODO: KG - Calculate Overlay and Bonus Size/Position ratios when the GameWindow is zooming
 
     public class MainWindowViewModel : ViewModelBase
     {

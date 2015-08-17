@@ -23,6 +23,7 @@ namespace Extender.Main.Models
         }
 
         public BonusItemsObservableCollection BonusItemsObservableCollection => _settingsRepository.BonusItems;
+        public readonly object BonusItemsLocker = new object();
 
         public Size WindowSize
         {
