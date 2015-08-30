@@ -121,6 +121,7 @@
         <Border Grid.Row="1" Background="{StaticResource EdgeBarBackgroundColor}" Padding="0">
             <DockPanel>
                 <ToggleButton DockPanel.Dock="Left" Style="{StaticResource EdgeToggleButton}"
+                              IsEnabled="{Binding IsBonusesOverlayEnabled}"
                               Content="Bonuses" Command="{Binding ShowBonusesOverlayCommand}" />
                 <Rectangle Width="10" />
                 <ToggleButton DockPanel.Dock="Right" Style="{StaticResource EdgeToggleButton}"

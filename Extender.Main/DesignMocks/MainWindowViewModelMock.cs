@@ -30,5 +30,7 @@ namespace Extender.Main.DesignMocks
         public Size WindowSize { get; set; } = new Size(1152, 690);
 
         public bool IsShowingBonusesOverlay { get; set; } = false;
+
+        public bool IsBonusesOverlayEnabled { get; set; } = true;
     }
 }

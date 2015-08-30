@@ -9,5 +9,10 @@ namespace Extender.Main
         {
             DispatcherHelper.Initialize();
         }
+
+        public App()
+        {
+            
+        }
     }
 }

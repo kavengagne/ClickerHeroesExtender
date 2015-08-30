@@ -160,7 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
-      <Project>{0AAED0AB-DB45-4AC5-95DD-B7BF65EA0024}</Project>
+      <Project>{0aaed0ab-db45-4ac5-95dd-b7bf65ea0024}</Project>
       <Name>WinApiWrapper</Name>
     </ProjectReference>
   </ItemGroup>

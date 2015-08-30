@@ -37,18 +37,22 @@ namespace Extender.Main.Helpers
 
 
         internal static TReturn TrySafe<TException, TReturn>(Func<TReturn> methodToExecute,
-                                                             Func<TReturn> methodOnError = null)
+                                                             Action<TException> methodOnError = null)
             where TException : Exception
         {
             try
             {
                 return methodToExecute.Invoke();
             }
-            catch (TException)
+            catch (TException ex)
             {
                 if (methodOnError != null)
                 {
-                    return TrySafe<TException, TReturn>(methodOnError.Invoke);
+                    return TrySafe<TException, TReturn>(() =>
+                    {
+                        methodOnError.Invoke(ex);
+                        return default(TReturn);
+                    });
                 }
                 return default(TReturn);
             }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Input;
 using Extender.Main.Messages;
 using Extender.Main.Models;
@@ -8,6 +7,7 @@ using Extender.Main.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
+using Size = System.Drawing.Size;
 
 
 namespace Extender.Main.ViewModels
@@ -34,6 +34,7 @@ namespace Extender.Main.ViewModels
         private IntPtr _windowHandle;
         private Size _windowSize;
         private bool _isShowingBonusesOverlay;
+        private bool _isBonusesOverlayEnabled;
 
 
         public MainWindowViewModel()
@@ -144,13 +145,23 @@ namespace Extender.Main.ViewModels
             }
         }
 
+        public bool IsBonusesOverlayEnabled
+        {
+            get { return _isBonusesOverlayEnabled; }
+            set
+            {
+                _isBonusesOverlayEnabled = value;
+                RaisePropertyChanged(() => IsBonusesOverlayEnabled);
+            }
+        }
+
 
         public ICommand StartStopCommand
             => _startStopCommand ?? (_startStopCommand = new RelayCommand(StartStop));
 
-        public ICommand ShowBonusesOverlayCommand
-            => _showBonusesOverlayCommand ?? (_showBonusesOverlayCommand = new RelayCommand(ShowBonusesOverlay));
-
+        public ICommand ShowBonusesOverlayCommand =>
+            _showBonusesOverlayCommand ?? (_showBonusesOverlayCommand = new RelayCommand(ShowBonusesOverlay));
+        
 
         public void Exit()
         {
@@ -202,6 +213,7 @@ namespace Extender.Main.ViewModels
         private void GameWindowChangedMessageHandler(GameWindowChangedMessage message)
         {
             IsStartStopEnabled = _settings.IsStarted || message.GameWindow != null;
+            IsBonusesOverlayEnabled = message.GameWindow != null;
 
             if (message.GameWindow == null)
             {

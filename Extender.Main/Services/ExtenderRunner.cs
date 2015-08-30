@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using Extender.Main.Enums;
 using Extender.Main.Helpers;
 using Extender.Main.Messages;
@@ -20,12 +21,9 @@ namespace Extender.Main.Services
         private readonly ExtenderSettings _settings;
         private readonly RunnerDispatcher _dispatcher;
 
-        private readonly IWinApiMouse _mouse;
-
         public ExtenderRunner(ExtenderSettings settings)
         {
             _settings = settings;
-            _mouse = new WinApiMouse();
 
             _dispatcher = new RunnerDispatcher();
             _dispatcher.Add(DispatcherItemId.BonusFish, RunBonusClicker, _settings.BonusDelay, false);
@@ -74,7 +72,7 @@ namespace Extender.Main.Services
             {
                 _settings.GameWindow = null;
             }
-            else if (_settings.GameWindow != window)
+            else if (!window.Equals(_settings.GameWindow))
             {
                 _settings.GameWindow = window;
             }
@@ -124,7 +122,7 @@ namespace Extender.Main.Services
         private void RunEnemyClicker()
         {
             // TODO: KG - Change key here when override key will be modifiable
-            if (!_mouse.IsRightButtonDown && _settings.IsAttackEnabled)
+            if (!WinApiMouse.IsRightButtonDown && _settings.IsAttackEnabled)
             {
                 ClickAtPoint(_settings.ClickPoint);
             }
@@ -148,7 +146,7 @@ namespace Extender.Main.Services
 
         private void RunBonusClicker()
         {
-            if (!_mouse.IsRightButtonDown && _settings.IsBonusEnabled)
+            if (!WinApiMouse.IsRightButtonDown && _settings.IsBonusEnabled)
             {
                 lock (_settings.BonusItemsLocker)
                 {
@@ -164,7 +162,7 @@ namespace Extender.Main.Services
         {
             if (_settings.GameWindow != null)
             {
-                _mouse.PerformClick(WinApiMouseButton.Left, point, _settings.GameWindow.Hwnd);
+                WinApiMouse.PerformClick(MouseButton.Left, point, _settings.GameWindow.Hwnd);
             }
         }
     }

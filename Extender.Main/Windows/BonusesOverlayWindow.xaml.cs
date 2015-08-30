@@ -84,6 +84,7 @@ namespace Extender.Main.Windows
         private void LocationChangedCallback(IntPtr winEventHookHandle, AccessibleEvents accEvent, IntPtr windowHandle,
                                              int objectId, int childId, uint eventThreadId, uint eventTimeInMilliseconds)
         {
+            // TODO: KG - Check Gamewindow is null
             if (accEvent == AccessibleEvents.LocationChange && windowHandle == _settings.GameWindow.Hwnd)
             {
                 SetOverlayPosition();
@@ -109,8 +110,7 @@ namespace Extender.Main.Windows
                 if ((absmouseXpos > leftlimit && absmouseXpos < rightlimit)
                     && (absmouseYpos > upperlimit && absmouseYpos < lowerlimit))
                 {
-                    var margin = new Thickness(e.GetPosition(canvas).X,
-                                               e.GetPosition(canvas).Y, 0, 0);
+                    var margin = new Thickness(e.GetPosition(canvas).X, e.GetPosition(canvas).Y, 0, 0);
                     item.SetValue(MarginProperty, margin);
                 }
             }
