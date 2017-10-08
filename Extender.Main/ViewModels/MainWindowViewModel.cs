@@ -8,7 +8,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using Size = System.Drawing.Size;
-
+using GalaSoft.MvvmLight.Threading;
 
 namespace Extender.Main.ViewModels
 {
@@ -214,6 +214,11 @@ namespace Extender.Main.ViewModels
         {
             IsStartStopEnabled = _settings.IsStarted || message.GameWindow != null;
             IsBonusesOverlayEnabled = message.GameWindow != null;
+
+            if (_isShowingBonusesOverlay && message.GameWindow == null)
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(ShowBonusesOverlay);
+            }
 
             if (message.GameWindow == null)
             {

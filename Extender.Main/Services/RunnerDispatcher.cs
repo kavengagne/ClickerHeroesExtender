@@ -12,12 +12,14 @@ namespace Extender.Main.Services
 {
     public class RunnerDispatcher
     {
+        private readonly int _resolution;
         private readonly ConcurrentDictionary<DispatcherItemId, DispatcherItem> _items;
         private readonly Stopwatch _stopwatch;
         private bool _isRunning;
 
-        public RunnerDispatcher()
+        public RunnerDispatcher(int resolution = 1)
         {
+            _resolution = resolution;
             _items = new ConcurrentDictionary<DispatcherItemId, DispatcherItem>();
             _stopwatch = Stopwatch.StartNew();
             Start();
@@ -121,7 +123,7 @@ namespace Extender.Main.Services
                     item.LastRun = _stopwatch.ElapsedMilliseconds;
                     item.Action.Invoke();
                 }
-                Thread.Sleep(1);
+                Thread.Sleep(_resolution);
             }
         }
     }

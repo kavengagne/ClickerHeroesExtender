@@ -84,8 +84,8 @@ namespace Extender.Main.Windows
         private void LocationChangedCallback(IntPtr winEventHookHandle, AccessibleEvents accEvent, IntPtr windowHandle,
                                              int objectId, int childId, uint eventThreadId, uint eventTimeInMilliseconds)
         {
-            // TODO: KG - Check Gamewindow is null
-            if (accEvent == AccessibleEvents.LocationChange && windowHandle == _settings.GameWindow.Hwnd)
+            if (accEvent == AccessibleEvents.LocationChange &&
+                _settings.GameWindow != null && _settings.GameWindow.Hwnd == windowHandle)
             {
                 SetOverlayPosition();
             }
