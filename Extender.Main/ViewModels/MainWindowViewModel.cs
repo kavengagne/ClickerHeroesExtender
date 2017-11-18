@@ -9,6 +9,11 @@ using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using Size = System.Drawing.Size;
 using GalaSoft.MvvmLight.Threading;
+using WinApiWrapper.Interfaces;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WinApiWrapper.Wrappers;
+using System.Linq;
 
 namespace Extender.Main.ViewModels
 {
@@ -35,11 +40,12 @@ namespace Extender.Main.ViewModels
         private Size _windowSize;
         private bool _isShowingBonusesOverlay;
         private bool _isBonusesOverlayEnabled;
-
+        private ObservableCollection<WindowInformation> _gameWindows;
 
         public MainWindowViewModel()
         {
             RegisterForGameWindowChangedMessages();
+            GameWindows = new ObservableCollection<WindowInformation>(GetAllGameWindows());
 
             _settings = new ExtenderSettings();
             _extenderRunner = new ExtenderRunner(_settings);
@@ -52,6 +58,12 @@ namespace Extender.Main.ViewModels
             SetStartStopLabel(false);
         }
 
+        private IList<WindowInformation> GetAllGameWindows()
+        {
+            return WinApiWindow.EnumWindows(w => w.IsDesktopWindow && !w.IsMinimized && w.Title?.Length > 0)
+                               .Select(w => new WindowInformation(w.Title, w.ClassName))
+                               .ToList();
+        }
 
         public BonusItemsObservableCollection BonusItems => _settings.BonusItemsObservableCollection;
 
@@ -92,6 +104,26 @@ namespace Extender.Main.ViewModels
             {
                 _settings.IsBonusEnabled = value;
                 RaisePropertyChanged(() => IsBonusEnabled);
+            }
+        }
+
+        public ObservableCollection<WindowInformation> GameWindows
+        {
+            get { return _gameWindows; }
+            set
+            {
+                _gameWindows = value;
+                RaisePropertyChanged(() => GameWindows);
+            }
+        }
+
+        public WindowInformation SelectedWindow
+        {
+            get { return _settings.SelectedWindow; }
+            set
+            {
+                _settings.SelectedWindow = value;
+                RaisePropertyChanged(() => SelectedWindow);
             }
         }
 
@@ -161,7 +193,7 @@ namespace Extender.Main.ViewModels
 
         public ICommand ShowBonusesOverlayCommand =>
             _showBonusesOverlayCommand ?? (_showBonusesOverlayCommand = new RelayCommand(ShowBonusesOverlay));
-        
+
 
         public void Exit()
         {
@@ -214,6 +246,11 @@ namespace Extender.Main.ViewModels
         {
             IsStartStopEnabled = _settings.IsStarted || message.GameWindow != null;
             IsBonusesOverlayEnabled = message.GameWindow != null;
+
+            if (SelectedWindow != null)
+            {
+
+            }
 
             if (_isShowingBonusesOverlay && message.GameWindow == null)
             {

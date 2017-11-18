@@ -102,12 +102,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controls\DotToggleButton.cs" />
     <Compile Include="DesignMocks\BonusOverlayMock.cs" />
     <Compile Include="DesignMocks\MainWindowViewModelMock.cs" />
     <Compile Include="Models\DispatcherItem.cs" />
     <Compile Include="Enums\DispatcherItemId.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Converters\PointToThicknessConverter.cs" />
+    <Compile Include="Models\WindowInformation.cs" />
     <Compile Include="Repositories\SettingsRepository.cs" />
     <Compile Include="Services\RunnerDispatcher.cs" />
     <Compile Include="Models\BonusItem.cs" />
@@ -163,7 +165,7 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
+    <ProjectReference Include="..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
       <Project>{0aaed0ab-db45-4ac5-95dd-b7bf65ea0024}</Project>
       <Name>WinApiWrapper</Name>
     </ProjectReference>

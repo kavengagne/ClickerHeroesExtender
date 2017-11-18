@@ -20,10 +20,28 @@ namespace Extender.Main.Models
         {
             _settingsRepository = new SettingsRepository("settings.json");
             IsStarted = false;
+            // TODO: KG - Validate that the window is opened
+            // TODO: KG - Refresh window list periodically
+            if (_settingsRepository.SelectedWindow != null)
+            {
+
+            }
         }
+
+        public BonusItem AttackLocation => _settingsRepository.AttackLocation;
 
         public BonusItemsObservableCollection BonusItemsObservableCollection => _settingsRepository.BonusItems;
         public readonly object BonusItemsLocker = new object();
+
+        public WindowInformation SelectedWindow
+        {
+            get { return _settingsRepository.SelectedWindow; }
+            set
+            {
+                _settingsRepository.SelectedWindow = value;
+                RaisePropertyChanged(() => SelectedWindow);
+            }
+        }
 
         public Size WindowSize
         {

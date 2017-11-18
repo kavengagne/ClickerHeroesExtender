@@ -23,6 +23,9 @@ namespace Extender.Main.Repositories
             Initialize();
         }
 
+        public BonusItem AttackLocation => _settingsModel.AttackLocation;
+
+        public BonusItemsObservableCollection BonusItems => _settingsModel.BonusItems;
 
         public Size WindowSize
         {
@@ -35,7 +38,16 @@ namespace Extender.Main.Repositories
             }
         }
 
-        public BonusItemsObservableCollection BonusItems => _settingsModel.BonusItems;
+        public WindowInformation SelectedWindow
+        {
+            get { return _settingsModel.SelectedWindow; }
+            set
+            {
+                _settingsModel.SelectedWindow = value;
+                RaisePropertyChanged(() => SelectedWindow);
+                _isSaveRequired = true;
+            }
+        }
 
         public bool IsAttackEnabled
         {
@@ -81,7 +93,6 @@ namespace Extender.Main.Repositories
             }
         }
 
-
         public void SaveToDisk()
         {
             if (_isSaveRequired)
@@ -96,6 +107,10 @@ namespace Extender.Main.Repositories
         {
             var jsonContentString = File.ReadAllText(_jsonFileName);
             _settingsModel = JsonConvert.DeserializeObject<SettingsModel>(jsonContentString);
+            if (_settingsModel.AttackLocation != null)
+            {
+                _settingsModel.AttackLocation.PropertyChanged += OnPropertyChangedEventHandler;
+            }
             foreach (var item in _settingsModel.BonusItems)
             {
                 item.PropertyChanged += OnPropertyChangedEventHandler;

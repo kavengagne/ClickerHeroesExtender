@@ -26,11 +26,7 @@ namespace Extender.Main.DesignMocks
             };
         }
 
+        public BonusItem AttackLocation => new BonusItem(new Point(300, 100), new Size(1000, 100));
         public BonusItemsObservableCollection BonusItems { get; set; }
-
-        public ICommand AddBonusItemCommand
-        {
-            get { throw new System.NotImplementedException(); }
-        }
     }
 }

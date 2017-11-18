@@ -12,7 +12,7 @@ using WinApiWrapper.Native.Enums;
 using WinApiWrapper.Native.Methods;
 using WinApiWrapper.Native.Structs;
 using WinApiWrapper.Wrappers;
-
+using System.Diagnostics;
 
 namespace Extender.Main.Services
 {
@@ -59,7 +59,7 @@ namespace Extender.Main.Services
         {
             if (_settings.GameWindow != null)
             {
-                AdjustWindowSize();
+                //AdjustWindowSize();
                 return true;
             }
             return false;
@@ -67,7 +67,13 @@ namespace Extender.Main.Services
 
         private void FindGameWindow()
         {
-            IWinApiWindow window = WinApiWindow.Find("ApolloRuntimeContentWindow", "Clicker Heroes");
+            IWinApiWindow window = null;
+            if (_settings.SelectedWindow != null)
+            {
+                // "ApolloRuntimeContentWindow", "Clicker Heroes"
+                window = WinApiWindow.Find(_settings.SelectedWindow.ClassName, _settings.SelectedWindow.Title);
+            }
+
             if (window == null)
             {
                 _settings.GameWindow = null;
@@ -87,11 +93,13 @@ namespace Extender.Main.Services
                 return;
             }
 
-            var clickPointRatio = new PointF(3 / 4f, 1 / 2f);
-            var areaSize = SizeHelper.GetGameAreaRectangle(_settings.GameWindow.ClientSize);
+            _settings.ClickPoint = _settings.AttackLocation.Position;
 
-            _settings.ClickPoint = new Point((int)(areaSize.Width * clickPointRatio.X + areaSize.X),
-                                             (int)(areaSize.Height * clickPointRatio.Y + areaSize.Y));
+            //var clickPointRatio = new PointF(3 / 4f, 1 / 2f);
+            //var areaSize = SizeHelper.GetGameAreaRectangle(_settings.GameWindow.ClientSize);
+
+            //_settings.ClickPoint = new Point((int)(areaSize.Width * clickPointRatio.X + areaSize.X),
+            //                                 (int)(areaSize.Height * clickPointRatio.Y + areaSize.Y));
         }
 
         private void AdjustWindowSize()
@@ -124,7 +132,10 @@ namespace Extender.Main.Services
             // TODO: KG - Change key here when override key will be modifiable
             if (!WinApiMouse.IsRightButtonDown && _settings.IsAttackEnabled)
             {
-                ClickAtPoint(_settings.ClickPoint);
+                if (_settings.ClickPoint != Point.Empty)
+                {
+                    ClickAtPoint(_settings.ClickPoint);
+                }
             }
         }
 

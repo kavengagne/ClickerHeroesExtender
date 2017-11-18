@@ -7,10 +7,13 @@ namespace Extender.Main.Models
     public class SettingsModel : ObservableObject
     {
         private BonusItemsObservableCollection _bonusItems;
+        private BonusItem _attackLocation;
 
         public SettingsModel()
         {
             WindowSize = new Size();
+
+            AttackLocation = new BonusItem(new Point(0, 0), new Size(0, 0));
             BonusItems = new BonusItemsObservableCollection();
 
             IsAttackEnabled = true;
@@ -21,7 +24,19 @@ namespace Extender.Main.Models
         }
 
 
+        public WindowInformation SelectedWindow { get; set; }
+
         public Size WindowSize { get; set; }
+
+        public BonusItem AttackLocation
+        {
+            get { return _attackLocation; }
+            set
+            {
+                _attackLocation = value;
+                RaisePropertyChanged(() => AttackLocation);
+            }
+        }
 
         public BonusItemsObservableCollection BonusItems
         {

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="ClickerBot for Clicker Heroes"
         Width="450" MinWidth="250"
-        Height="325" MinHeight="212"
+        Height="355" MinHeight="212"
         Closing="Window_Closing"
         x:Name="MyMainWindow">
 
@@ -62,58 +62,73 @@
                 <Rectangle Height="10" />
 
                 <GroupBox Header="Game Window Information" Padding="5,10,5,5">
-                    <ContentControl>
-                        <ContentControl.Style>
-                            <Style TargetType="{x:Type ContentControl}">
-                                <Style.Resources>
-                                    <DataTemplate x:Key="GameWindowInfoTemplate">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition MinWidth="100" Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
+                    <StackPanel>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center"
+                                       Text="Game" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <ComboBox DockPanel.Dock="Right"
+                                      ItemsSource="{Binding ElementName=MyMainWindow, Path=DataContext.GameWindows}"
+                                      DisplayMemberPath="Title"
+                                      SelectedItem="{Binding ElementName=MyMainWindow, Path=DataContext.SelectedWindow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsSynchronizedWithCurrentItem="True"
+                                      />
+                        </DockPanel>
+                        <ContentControl>
+                            <ContentControl.Style>
+                                <Style TargetType="{x:Type ContentControl}">
+                                    <Style.Resources>
+                                        <DataTemplate x:Key="GameWindowInfoTemplate">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition MinWidth="100" Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                    <RowDefinition />
+                                                </Grid.RowDefinitions>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Title" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="0"
+                                                <Separator Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" />
+                                                
+                                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Title" FontWeight="Bold" />
+                                                <TextBlock Grid.Column="1" Grid.Row="1"
                                                        Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowTitle}" />
 
-                                            <Separator Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" />
+                                                <Separator Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" />
 
-                                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Handle" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="2"
+                                                <TextBlock Grid.Column="0" Grid.Row="3" Text="Handle" FontWeight="Bold" />
+                                                <TextBlock Grid.Column="1" Grid.Row="3"
                                                        Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowHandle}" />
 
-                                            <Separator Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
+                                                <Separator Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" />
 
-                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Size" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="4"
+                                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Size" FontWeight="Bold" />
+                                                <TextBlock Grid.Column="1" Grid.Row="5"
                                                        Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowSize}" />
-                                        </Grid>
-                                    </DataTemplate>
-                                    <DataTemplate x:Key="GameWindowNotFoundTemplate">
-                                        <Grid>
-                                            <TextBlock HorizontalAlignment="Center" Text="Game Window not found" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </Style.Resources>
+                                            </Grid>
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="GameWindowNotFoundTemplate">
+                                            <Grid>
+                                                <TextBlock HorizontalAlignment="Center" Text="Game Window not found" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </Style.Resources>
 
-                                <Setter Property="ContentTemplate" Value="{StaticResource GameWindowInfoTemplate}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding WindowSize.IsEmpty}" Value="True">
-                                        <Setter Property="ContentTemplate"
+                                    <Setter Property="ContentTemplate" Value="{StaticResource GameWindowInfoTemplate}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding WindowSize.IsEmpty}" Value="True">
+                                            <Setter Property="ContentTemplate"
                                                 Value="{StaticResource GameWindowNotFoundTemplate}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContentControl.Style>
-                    </ContentControl>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </StackPanel>
                 </GroupBox>
                 <Rectangle Height="10" />
             </StackPanel>
