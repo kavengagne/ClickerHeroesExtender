@@ -4,15 +4,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:designMocks="clr-namespace:Extender.Main.DesignMocks"
+        xmlns:converters="clr-namespace:Extender.Main.Converters"
         mc:Ignorable="d"
         Title="ClickerBot for Clicker Heroes"
         Width="450" MinWidth="250"
-        Height="325" MinHeight="212"
+        Height="315" MinHeight="212"
         Closing="Window_Closing"
         x:Name="MyMainWindow">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:ReverseVisibilityConverter x:Key="ReverseVisibilityConverter" />
     </Window.Resources>
 
     <Grid d:DataContext="{d:DesignInstance Type=designMocks:MainWindowViewModelMock, IsDesignTimeCreatable=True}">
@@ -61,61 +63,40 @@
 
                 <Rectangle Height="10" />
 
-                <GroupBox Header="Game Window Information" Padding="5,10,5,5">
-                    <ContentControl>
-                        <ContentControl.Style>
-                            <Style TargetType="{x:Type ContentControl}">
-                                <Style.Resources>
-                                    <DataTemplate x:Key="GameWindowInfoTemplate">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition MinWidth="100" Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
+                <GroupBox Header="Game Window Information (New)" Padding="5,10,5,5">
+                    <Grid>
+                        <Grid Visibility="{Binding ElementName=GameNotFoundTemplate, Path=Visibility, Converter={StaticResource ReverseVisibilityConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MinWidth="100" Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Title" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="0"
-                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowTitle}" />
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Title" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Path=WindowTitle}" />
 
-                                            <Separator Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" />
+                            <Separator Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" />
 
-                                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Handle" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="2"
-                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowHandle}" />
+                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Handle" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Path=WindowHandle}" />
 
-                                            <Separator Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
+                            <Separator Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
 
-                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Size" FontWeight="Bold" />
-                                            <TextBlock Grid.Column="1" Grid.Row="4"
-                                                       Text="{Binding ElementName=MyMainWindow, Path=DataContext.WindowSize}" />
-                                        </Grid>
-                                    </DataTemplate>
-                                    <DataTemplate x:Key="GameWindowNotFoundTemplate">
-                                        <Grid>
-                                            <TextBlock HorizontalAlignment="Center" Text="Game Window not found" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </Style.Resources>
-
-                                <Setter Property="ContentTemplate" Value="{StaticResource GameWindowInfoTemplate}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding WindowSize.IsEmpty}" Value="True">
-                                        <Setter Property="ContentTemplate"
-                                                Value="{StaticResource GameWindowNotFoundTemplate}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContentControl.Style>
-                    </ContentControl>
+                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Size" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Path=WindowSize}" />
+                        </Grid>
+                        <Grid x:Name="GameNotFoundTemplate" Visibility="{Binding WindowSize.IsEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Text="Clicker Heroes Game Window not found" />
+                        </Grid>
+                    </Grid>
                 </GroupBox>
-                <Rectangle Height="10" />
             </StackPanel>
         </ScrollViewer>
         <Border Grid.Row="1" Background="{StaticResource EdgeBarBackgroundColor}" Padding="0">

@@ -102,6 +102,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\ReverseVisibilityConverter.cs" />
     <Compile Include="DesignMocks\BonusOverlayMock.cs" />
     <Compile Include="DesignMocks\MainWindowViewModelMock.cs" />
     <Compile Include="Models\DispatcherItem.cs" />
@@ -163,8 +164,8 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
-      <Project>{0aaed0ab-db45-4ac5-95dd-b7bf65ea0024}</Project>
+    <ProjectReference Include="..\..\WinApiWrapperLibrary\WinApiWrapper\WinApiWrapper.csproj">
+      <Project>{0AAED0AB-DB45-4AC5-95DD-B7BF65EA0024}</Project>
       <Name>WinApiWrapper</Name>
     </ProjectReference>
   </ItemGroup>
